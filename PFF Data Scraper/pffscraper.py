@@ -15,18 +15,23 @@ import conditional
 link = input('Paste an entire ProFootballReference link here: ')
 source = requests.get(link).text
 soup = BeautifulSoup(source, "lxml")
-
+	
 # Print out name of player inputted
 name = soup.findAll("h1", {"itemprop" : "name"})
 name = [d.text for d in name]
 name = "".join(map(str, name))
 print("You selected:", name)
 
+for find_position in soup.find('h2'):
+	if find_position == "Receiving & Rushing":
+		print("The player selected is mainly a RB/WR/TE")
+	elif find_position == "Passing":
+		print("The player selected is mainly a QB")
 
 # Search function in conditional.py
 x = False
 while x == False:
-	x = conditional.simplify(x)
+	x = conditional.simplify(x, find_position)
 
 # Initialize blank array
 datalist = [None] * 50
@@ -41,6 +46,8 @@ for a1 in soup.findAll("tr", {"class" : "full_table"}):
 
 # Filter out empty list entries and convert from text to float
 datalist = list(filter(None, datalist))
+if x == "catch_pct":
+	datalist = [item.replace("%","") for item in datalist]
 datalist = list(map(float, datalist))
 
 # If no stats in category, exit program; otherwise find max value of list for later
