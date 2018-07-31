@@ -2,7 +2,6 @@
    Currently, this program only works with pure WRs, but I will expand its functions further soon.
    Made by Prashant Shankar"""
 
-
 # Import necessary materials
 from bs4 import BeautifulSoup
 import requests
@@ -34,21 +33,30 @@ while x == False:
 	x = conditional.simplify(x, find_position)
 
 # Initialize blank array
-datalist = [None] * 50
+datalist = ["blank"] * 50
 
 # Find receiving-related stats and put on datalist array
 # WARNING: Currently does not work with catch %
 d = 0
 for a1 in soup.findAll("tr", {"class" : "full_table"}):
 	for a2 in a1.findAll("td", {"data-stat" : x}):
-		datalist[d] = a2.text
+		if a2.text == '':
+			datalist[d] = '0'
+		else:
+			datalist[d] = a2.text
 		d += 1
-
+		
 # Filter out empty list entries and convert from text to float
-datalist = list(filter(None, datalist))
+a = 0
+for c in range(0, 49):
+	if datalist[c] == "blank":
+		a += 1
+for b in range(0, a + 1):
+	datalist.remove("blank")
 if x == "catch_pct":
 	datalist = [item.replace("%","") for item in datalist]
 datalist = list(map(float, datalist))
+
 
 # If no stats in category, exit program; otherwise find max value of list for later
 if not datalist:
