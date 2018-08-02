@@ -50,8 +50,8 @@ def simplify(x, position):
 	if a == 0:
 		x = False
 		if position == "Passing":
-			# Did this to reduce length of QBinput array
+			# Did this to reduce length of input arrays
 			print("Input not understood, please clarify (try not including 'qb' or 'quarterback' directly in your search)")
-		else:
-			print("Input not understood, please clarify")
+		elif position == "Receiving & Rushing":
+			print("Input not understood, please clarify (try clarifying if you want the receiving or rushing stat)")
 	return x

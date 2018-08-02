@@ -9,6 +9,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import conditional
+import summation
 
 # Fetch a PFF link
 link = input('Paste an entire ProFootballReference link here: ')
@@ -32,6 +33,11 @@ x = False
 while x == False:
 	x = conditional.simplify(x, find_position)
 
+y = False
+while y == False:
+	y = summation.summation(y)
+	
+	
 # Initialize blank array
 datalist = ["blank"] * 50
 
@@ -56,14 +62,21 @@ for b in range(0, a + 1):
 if x == "catch_pct":
 	datalist = [item.replace("%","") for item in datalist]
 datalist = list(map(float, datalist))
+datalen = len(datalist)
 
 
 # If no stats in category, exit program; otherwise find max value of list for later
 if not datalist:
 	print("No stats in selected category found! Now exiting program.")
 	exit()
-maxstat = max(datalist)
+	
+if y == "cumulative":
+	datacopy = datalist.copy()
+	for d in range(1, datalen):
+		datalist[d] = datalist[d] + datalist[d - 1]
+print(datalist)	
 
+#maxstat = max(datalist)
 # Get year list, filter out awards/unnecessary entries, then map to integer list
 statsyear = soup.findAll("th", {"data-stat" : "year_id"})
 statsyear = [d.text for d in statsyear]
@@ -77,7 +90,7 @@ statsyear = [z for z in statsyear if "Career" not in z]
 year = list(map(int, statsyear))
 
 # Plot data on simple graph
-plt.plot(year,datalist, 'ro')
+plt.plot(year,datalist)
 xint = range(min(year), math.ceil(max(year)) + 1)
 plt.xticks(xint)
 plt.show()
