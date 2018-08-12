@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import conditional
 import summation
+import exception
 
 # Fetch a PFF link
 link = input('Paste an entire ProFootballReference link here: ')
@@ -22,6 +23,7 @@ name = [d.text for d in name]
 name = "".join(map(str, name))
 print("You selected:", name)
 
+# Identify if a rusher/receiver/quarterback is found
 for find_position in soup.find('h2'):
 	if find_position == "Receiving & Rushing":
 		print("The player selected is mainly a RB/WR/TE")
@@ -29,13 +31,18 @@ for find_position in soup.find('h2'):
 		print("The player selected is mainly a QB")
 
 # Search function in conditional.py
-x = False
-while x == False:
+x = (False, False)
+while x == (False, False):
 	x = conditional.simplify(x, find_position)
+statname = x[0]
+realstatname = x[1]
 
+# Give user stat options in summation.py, unless cumulative stats are unnecessary
 y = False
-while y == False:
-	y = summation.summation(y)
+tuple = exception.nocumulative()
+if statname not in tuple:
+	while y == False:
+		y = summation.summation(y)
 	
 	
 # Initialize blank array
@@ -45,7 +52,7 @@ datalist = ["blank"] * 50
 # WARNING: Currently does not work with catch %
 d = 0
 for a1 in soup.findAll("tr", {"class" : "full_table"}):
-	for a2 in a1.findAll("td", {"data-stat" : x}):
+	for a2 in a1.findAll("td", {"data-stat" : statname}):
 		if a2.text == '':
 			datalist[d] = '0'
 		else:
@@ -59,7 +66,7 @@ for c in range(0, 49):
 		a += 1
 for b in range(0, a + 1):
 	datalist.remove("blank")
-if x == "catch_pct":
+if statname == "catch_pct":
 	datalist = [item.replace("%","") for item in datalist]
 datalist = list(map(float, datalist))
 datalen = len(datalist)
@@ -69,7 +76,8 @@ datalen = len(datalist)
 if not datalist:
 	print("No stats in selected category found! Now exiting program.")
 	exit()
-	
+
+# If cumulative data chosen, cumulative-sum datalist	
 if y == "cumulative":
 	datacopy = datalist.copy()
 	for d in range(1, datalen):
@@ -93,4 +101,5 @@ year = list(map(int, statsyear))
 plt.plot(year,datalist)
 xint = range(min(year), math.ceil(max(year)) + 1)
 plt.xticks(xint)
+plt.suptitle(realstatname + " for " + name)
 plt.show()
